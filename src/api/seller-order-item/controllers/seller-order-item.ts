@@ -1,0 +1,7 @@
+/**
+ * seller-order-item controller
+ */
+
+import { factories } from '@strapi/strapi'
+
+export default factories.createCoreController('api::seller-order-item.seller-order-item');

@@ -1,0 +1,25 @@
+{
+  "kind": "collectionType",
+  "collectionName": "vendedors",
+  "info": {
+    "singularName": "vendedor",
+    "pluralName": "vendedors",
+    "displayName": "vendedor"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+
+     "nombre": {"type": "string", "required": true},
+"telefono": {"type": "string"},
+"precio_porcentaje": {"type": "decimal"},
+"seller_orders": {
+"type": "relation",
+"relation": "oneToMany",
+"target": "api::seller-order.seller-order",
+"mappedBy": "vendedor"
+}
+  }
+}

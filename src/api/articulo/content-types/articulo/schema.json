@@ -1,0 +1,39 @@
+{
+  "kind": "collectionType",
+  "collectionName": "articulos",
+  "info": {
+    "singularName": "articulo",
+    "pluralName": "articulos",
+    "displayName": "articulo"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "sku": {"type": "string", "unique": true},
+    "marca": {"type": "string", "required": true},
+    "mililitros": {"type": "integer"},
+    "precio_proveedor": {"type": "decimal"},
+    "precio_venta": {"type": "decimal"},
+    "stock": {"type": "integer", "default": 0},
+    "proveedor": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::proveedor.proveedor",
+      "inversedBy": "articulos"
+    },
+    "purchase_items": {
+    "type": "relation",
+    "relation": "oneToMany",
+    "target": "api::purchase-item.purchase-item",
+    "mappedBy": "articulo"
+    },
+    "seller_order_items": {
+    "type": "relation",
+    "relation": "oneToMany",
+    "target": "api::seller-order-item.seller-order-item",
+    "mappedBy": "articulo"
+    }
+  }
+}

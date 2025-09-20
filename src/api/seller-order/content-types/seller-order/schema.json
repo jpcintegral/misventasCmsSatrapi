@@ -1,0 +1,53 @@
+{
+  "kind": "collectionType",
+  "collectionName": "seller_orders",
+  "info": {
+    "singularName": "seller-order",
+    "pluralName": "seller-orders",
+    "displayName": "seller-order"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "codigo": {
+      "type": "string",
+      "unique": true
+    },
+    "fecha": {
+      "type": "datetime"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "PENDIENTE",
+        "PARCIAL",
+        "PAGADO",
+        "CANCELADO"
+      ],
+      "default": "PENDIENTE"
+    },
+    "total": {
+      "type": "decimal"
+    },
+    "vendedor": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::vendedor.vendedor",
+      "inversedBy": "seller_orders"
+    },
+    "items": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::seller-order-item.seller-order-item",
+      "mappedBy": "seller_order"
+    },
+    "payments": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::payment.payment",
+      "mappedBy": "seller_order"
+    }
+  }
+}

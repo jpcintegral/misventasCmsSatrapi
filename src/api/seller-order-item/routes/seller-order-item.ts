@@ -1,0 +1,7 @@
+/**
+ * seller-order-item router
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreRouter('api::seller-order-item.seller-order-item');

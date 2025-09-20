@@ -1,0 +1,52 @@
+{
+  "kind": "collectionType",
+  "collectionName": "purchase_orders",
+  "info": {
+    "singularName": "purchase-order",
+    "pluralName": "purchase-orders",
+    "displayName": "purchase-order"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "codigo": {
+      "type": "string",
+      "unique": true
+    },
+    "fecha": {
+      "type": "datetime"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "PENDIENTE",
+        "PARCIAL",
+        "PAGADO"
+      ],
+      "default": "PENDIENTE"
+    },
+    "total": {
+      "type": "decimal"
+    },
+    "proveedor": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::proveedor.proveedor",
+      "inversedBy": "purchase_orders"
+    },
+    "items": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::purchase-item.purchase-item",
+      "mappedBy": "purchase_order"
+    },
+    "payments": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::payment.payment",
+      "mappedBy": "purchase_order"
+    }
+  }
+}

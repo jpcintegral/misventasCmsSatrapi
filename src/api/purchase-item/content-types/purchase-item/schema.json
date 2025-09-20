@@ -1,0 +1,30 @@
+{
+  "kind": "collectionType",
+  "collectionName": "purchase_items",
+  "info": {
+    "singularName": "purchase-item",
+    "pluralName": "purchase-items",
+    "displayName": "purchase-item"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "cantidad": {"type": "integer"},
+    "precio": {"type": "decimal"},
+    "subtotal": {"type": "decimal"},
+    "purchase_order": {
+    "type": "relation",
+    "relation": "manyToOne",
+    "target": "api::purchase-order.purchase-order",
+    "inversedBy": "items"
+    },
+    "articulo": {
+    "type": "relation",
+    "relation": "manyToOne",
+    "target": "api::articulo.articulo",
+    "inversedBy": "purchase_items"
+    }
+  }
+}

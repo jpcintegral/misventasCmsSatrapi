@@ -1,0 +1,43 @@
+{
+  "kind": "collectionType",
+  "collectionName": "payments",
+  "info": {
+    "singularName": "payment",
+    "pluralName": "payments",
+    "displayName": "payment "
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "fecha": {
+      "type": "datetime"
+    },
+    "monto": {
+      "type": "decimal"
+    },
+    "evidencia": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "videos",
+        "audios",
+        "files"
+      ]
+    },
+    "purchase_order": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::purchase-order.purchase-order",
+      "inversedBy": "payments"
+    },
+    "seller_order": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::seller-order.seller-order",
+      "inversedBy": "payments"
+    }
+  }
+}

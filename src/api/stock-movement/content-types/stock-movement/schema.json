@@ -1,0 +1,25 @@
+{
+  "kind": "collectionType",
+  "collectionName": "stock_movements",
+  "info": {
+    "singularName": "stock-movement",
+    "pluralName": "stock-movements",
+    "displayName": "stock-movement"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+
+"tipo": {"type": "enumeration", "enum": ["entrada", "venta", "surtido", "ajuste"]},
+"cantidad": {"type": "integer"},
+"fecha": {"type": "datetime"},
+"nota": {"type": "string"},
+"articulo": {
+"type": "relation",
+"relation": "manyToOne",
+"target": "api::articulo.articulo"
+}
+  }
+}
