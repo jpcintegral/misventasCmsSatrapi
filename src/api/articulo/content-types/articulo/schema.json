@@ -17,6 +17,15 @@
     "precio_proveedor": {"type": "decimal"},
     "precio_venta": {"type": "decimal"},
     "stock": {"type": "integer", "default": 0},
+     "imagen": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "videos",
+        "audios",
+        "files"
+      ]},
     "proveedor": {
       "type": "relation",
       "relation": "manyToOne",
