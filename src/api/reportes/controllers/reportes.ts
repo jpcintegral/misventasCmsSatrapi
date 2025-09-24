@@ -18,28 +18,38 @@ async stock(ctx: Context) {
       ctx.throw(500, `Error generando reporte de stock: ${err.message}`);
     }
   },
+async pagosPendientes(ctx: Context) {
+  const compras: any[] = await strapi.db.query('api::purchase-order.purchase-order').findMany({
+    populate: ['proveedor', 'payments'],
+  });
 
-  async pagosPendientes(ctx: Context) {
-    const compras: any[] = await strapi.db.query('api::purchase-order.purchase-order').findMany({
-      populate: ['proveedor', 'payments'],
-    });
+  // Usamos un array de objetos para almacenar id, nombre y total pendiente
+  const data: { id: number; nombre: string; totalPendiente: number }[] = [];
 
-    const data: Record<string, number> = {};
+  compras.forEach(c => {
+    const totalPagos = c.payments?.reduce((acc, p) => acc + (p.monto ?? 0), 0) ?? 0;
+    const pendiente = (c.total ?? 0) - totalPagos;
 
-    compras.forEach(c => {
-      const totalPagos = c.payments?.reduce((acc, p) => acc + (p.monto ?? 0), 0) ?? 0;
-      const pendiente = (c.total ?? 0) - totalPagos;
-      if (pendiente > 0) {
-        const proveedor = c.proveedor?.nombre ?? 'N/A';
-        data[proveedor] = (data[proveedor] ?? 0) + pendiente;
+    if (pendiente > 0) {
+      const proveedor = c.proveedor;
+      if (!proveedor) return;
+
+      // Buscar si ya existe el proveedor en el array
+      const existente = data.find(d => d.id === proveedor.id);
+      if (existente) {
+        existente.totalPendiente += pendiente;
+      } else {
+        data.push({
+          id: proveedor.id,
+          nombre: proveedor.nombre ?? 'N/A',
+          totalPendiente: pendiente,
+        });
       }
-    });
+    }
+  });
 
-    return Object.entries(data).map(([proveedor, totalPendiente]) => ({
-      proveedor,
-      totalPendiente,
-    }));
-  },
+  return data;
+},
 
   async comprasPagas(ctx: Context) {
     const compras: any[] = await strapi.db.query('api::purchase-order.purchase-order').findMany({
@@ -55,26 +65,34 @@ async stock(ctx: Context) {
   },
 
   async deudaVendedores(ctx: Context) {
-    const ventas: any[] = await strapi.db.query('api::seller-order.seller-order').findMany({
-      populate: ['vendedor', 'payments'],
-    });
+  const ventas: any[] = await strapi.db.query('api::seller-order.seller-order').findMany({
+    populate: ['vendedor', 'payments'],
+  });
 
-    const data: Record<string, number> = {};
+  // Usamos un objeto para agrupar por ID de vendedor
+  const data: Record<string, { id: number; nombre: string; deuda: number }> = {};
 
-    ventas.forEach(v => {
-      if (v.status !== 'PAGADO') {
-        const totalPagos = v.payments?.reduce((acc, p) => acc + (p.monto ?? 0), 0) ?? 0;
-        const pendiente = (v.total ?? 0) - totalPagos;
-        const vendedor = v.vendedor?.nombre ?? 'N/A';
-        data[vendedor] = (data[vendedor] ?? 0) + pendiente;
+  ventas.forEach(v => {
+    if ((v.status !== 'PAGADO' && v.status !== 'CANCELADO')  && v.vendedor) {
+      const totalPagos =
+        v.payments?.reduce((acc, p) => acc + (p.monto ?? 0), 0) ?? 0;
+
+      const pendiente = (v.total ?? 0) - totalPagos;
+
+      const vendedorId = v.vendedor.id;
+      const vendedorNombre = v.vendedor.nombre ?? 'N/A';
+
+      if (!data[vendedorId]) {
+        data[vendedorId] = { id: vendedorId, nombre: vendedorNombre, deuda: 0 };
       }
-    });
 
-    return Object.entries(data).map(([vendedor, deuda]) => ({
-      vendedor,
-      deuda,
-    }));
-  },
+      data[vendedorId].deuda += pendiente;
+    }
+  });
+
+  return Object.values(data);
+}
+,
 
   async ventasPagas(ctx: Context) {
     const ventas: any[] = await strapi.db.query('api::seller-order.seller-order').findMany({

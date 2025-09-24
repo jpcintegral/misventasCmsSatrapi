@@ -1,5 +1,6 @@
 import type { Core } from '@strapi/strapi';
 
+
 export default {
   register({ strapi }: { strapi: Core.Strapi }) {
 
@@ -27,43 +28,54 @@ export default {
         data.fecha = fecha;
       },
 
-      async afterUpdate(event) {
-        const { result } = event;
-         if (result.status !== 'PARCIAL' && result.status !== 'PAGADO') return;
+  async afterUpdate(event) {
+  const { result } = event;
+  
+  if (result.status !== 'PARCIAL' && result.status !== 'PAGADO') return;
 
-        const order = await strapi.db.query('api::purchase-order.purchase-order').findOne({
-          where: { id: result.id },
-          populate: { items: { populate: { articulo: true } } },
-        });
+  const order = await strapi.db.query('api::purchase-order.purchase-order').findOne({
+    where: { id: result.id },
+    populate: { items: { populate: { articulo: true } } },
+  });
 
-        if (!order?.items) return;
+  if (!order?.items) return;
 
-        for (const item of order.items) {
-          const articuloId = item.articulo?.id || item.articulo;
-          if (!articuloId) continue;
+  for (const item of order.items) {
+    const articuloId = item.articulo?.id || item.articulo;
+    if (!articuloId) continue;
 
-          await strapi.db.query('api::stock-movement.stock-movement').create({
-            data: {
-              articulo: articuloId,
-              cantidad: item.cantidad,
-              tipo: 'entrada',
-              fecha: new Date(),
-              nota: `Pedido proveedor #${order.codigo}`,
-            },
-          });
+    // Verificar si ya existe un movimiento de stock para este pedido y artículo
+    const existingMovement = await strapi.db.query('api::stock-movement.stock-movement').findOne({
+      where: { articulo: articuloId, nota: `Pedido proveedor #${order.codigo}` },
+    });
 
-          const articulo = await strapi.db.query('api::articulo.articulo').findOne({
-            where: { id: articuloId },
-          });
+    if (existingMovement) continue; // ya sumado, no hacemos nada
 
-          if (articulo) {
-            await strapi.db.query('api::articulo.articulo').update({
-              where: { id: articuloId },
-              data: { stock: (articulo.stock || 0) + item.cantidad },
-            });
-          }
-        }
+    // Crear movimiento de stock
+    await strapi.db.query('api::stock-movement.stock-movement').create({
+      data: {
+        articulo: articuloId,
+        cantidad: item.cantidad,
+        tipo: 'entrada',
+        fecha: new Date(),
+        nota: `Pedido proveedor #${order.codigo}`,
       },
+    });
+
+    // Actualizar stock del artículo
+    const articulo = await strapi.db.query('api::articulo.articulo').findOne({
+      where: { id: articuloId },
+    });
+
+    if (articulo) {
+      await strapi.db.query('api::articulo.articulo').update({
+        where: { id: articuloId },
+        data: { stock: (articulo.stock || 0) + item.cantidad },
+      });
+    }
+  }
+}
+
     });
 
 // =========================
@@ -127,7 +139,7 @@ strapi.db.lifecycles.subscribe({
       where: { id: articuloId },
       data: { stock: Math.max((articulo.stock || 0) - item.cantidad, 0) },
     });
-
+      console.log("actualizar articulo");
     // Registrar movimiento de stock
     await strapi.db.query('api::stock-movement.stock-movement').create({
       data: {
