@@ -17,22 +17,29 @@ export default factories.createCoreController(
 
       try {
         // Traer todos los pedidos del vendedor que NO estén cancelados
-        const pedidos = await strapi.db.query('api::seller-order.seller-order').findMany({
-          where: {
-            vendedor: vendedorId,
-            status: { $ne: 'CANCELADO' }, // excluir cancelados
-          },
-          populate: {
-            items: { populate: { articulo: true } },
-            payments: true,
-          },
-          orderBy: { createdAt: 'asc' },
-        });
+       const pedidos = await strapi.db.query('api::seller-order.seller-order').findMany({
+              where: {
+                status: { $ne: 'CANCELADO' },
+              },
+              populate: {
+                items: { populate: { articulo: true } },
+                payments: true,
+                vendedor: true,
+              },
+              orderBy: { createdAt: 'asc' },
+            });
+
+            // Filtrar pedidos para este vendedor o ventas directas si vendedorId = 0
+            const pedidosFiltrados = pedidos.filter(p => {
+              const idVendedor = p.vendedor?.id ?? 0;
+              return idVendedor === Number(vendedorId);
+            });
+
 
         let totalAdeudo = 0;
 
         // Procesar cada pedido
-        const pedidosProcesados = pedidos.map(pedido => {
+        const pedidosProcesados = pedidosFiltrados.map(pedido => {
           const totalPagado =
             pedido.payments?.reduce((sum, p) => sum + (p.monto || 0), 0) || 0;
           const totalPedido =
@@ -44,7 +51,7 @@ export default factories.createCoreController(
           const itemsProcesados = pedido.items.map(i => ({
             marca: i.articulo?.marca,
             cantidad: i.cantidad,
-            precio: i.precio_al_vendedor,
+            precio: i.precio_al_vendedor ?? i.precio_venta,
             subtotal: i.subtotal,
             imagen: i.articulo?.imagen?.[0]?.formats?.small?.url || '',
           }));
