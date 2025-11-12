@@ -20,13 +20,13 @@
     },
     "status": {
       "type": "enumeration",
+      "default": "PENDIENTE",
       "enum": [
         "PENDIENTE",
         "PARCIAL",
         "PAGADO",
         "CANCELADO"
-      ],
-      "default": "PENDIENTE"
+      ]
     },
     "total": {
       "type": "decimal"
@@ -48,6 +48,9 @@
       "relation": "oneToMany",
       "target": "api::payment.payment",
       "mappedBy": "seller_order"
+    },
+    "comentario": {
+      "type": "text"
     }
   }
 }

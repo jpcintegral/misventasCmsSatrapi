@@ -11,21 +11,29 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "cantidad": {"type": "integer"},
-"precio_al_vendedor": {"type": "decimal"},
-"precio_venta": {"type": "decimal"},
-"subtotal": {"type": "decimal"},
-"seller_order": {
-"type": "relation",
-"relation": "manyToOne",
-"target": "api::seller-order.seller-order",
-"inversedBy": "items"
-},
-"articulo": {
-"type": "relation",
-"relation": "manyToOne",
-"target": "api::articulo.articulo",
-"inversedBy": "seller_order_items"
-}
+    "cantidad": {
+      "type": "integer"
+    },
+    "precio_al_vendedor": {
+      "type": "decimal"
+    },
+    "precio_venta": {
+      "type": "decimal"
+    },
+    "subtotal": {
+      "type": "decimal"
+    },
+    "seller_order": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::seller-order.seller-order",
+      "inversedBy": "items"
+    },
+    "articulo": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::articulo.articulo",
+      "inversedBy": "seller_order_items"
+    }
   }
 }

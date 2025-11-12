@@ -11,15 +11,21 @@
   },
   "pluginOptions": {},
   "attributes": {
-
-     "nombre": {"type": "string", "required": true},
-"telefono": {"type": "string"},
-"precio_porcentaje": {"type": "decimal"},
-"seller_orders": {
-"type": "relation",
-"relation": "oneToMany",
-"target": "api::seller-order.seller-order",
-"mappedBy": "vendedor"
-}
+    "nombre": {
+      "type": "string",
+      "required": true
+    },
+    "telefono": {
+      "type": "string"
+    },
+    "precio_porcentaje": {
+      "type": "decimal"
+    },
+    "seller_orders": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::seller-order.seller-order",
+      "mappedBy": "vendedor"
+    }
   }
 }

@@ -620,6 +620,7 @@ export interface ApiSellerOrderSellerOrder extends Struct.CollectionTypeSchema {
   };
   attributes: {
     codigo: Schema.Attribute.String & Schema.Attribute.Unique;
+    comentario: Schema.Attribute.Text;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
